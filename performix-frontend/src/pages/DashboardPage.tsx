@@ -83,59 +83,59 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
           Welcome back, {user?.full_name}! 💪
         </h1>
-        <p className="text-white/80">Ready to crush your fitness goals today?</p>
+        <p className="text-white/80 text-sm sm:text-base">Ready to crush your fitness goals today?</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/80 text-sm">Total Bookings</p>
-                <p className="text-2xl font-bold">{bookings.length}</p>
+                <p className="text-white/80 text-xs sm:text-sm">Total Bookings</p>
+                <p className="text-xl sm:text-2xl font-bold">{bookings.length}</p>
               </div>
-              <Calendar className="h-8 w-8 text-blue-400" />
+              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/80 text-sm">Active Classes</p>
-                <p className="text-2xl font-bold">{classes.length}</p>
+                <p className="text-white/80 text-xs sm:text-sm">Active Classes</p>
+                <p className="text-xl sm:text-2xl font-bold">{classes.length}</p>
               </div>
-              <Zap className="h-8 w-8 text-yellow-400" />
+              <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/80 text-sm">Membership</p>
-                <p className="text-2xl font-bold capitalize">
+                <p className="text-white/80 text-xs sm:text-sm">Membership</p>
+                <p className="text-xl sm:text-2xl font-bold capitalize">
                   {membership ? membership.type : 'None'}
                 </p>
               </div>
-              <Trophy className="h-8 w-8 text-green-400" />
+              <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 text-white">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/80 text-sm">This Week</p>
-                <p className="text-2xl font-bold">
+                <p className="text-white/80 text-xs sm:text-sm">This Week</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   {bookings.filter(b => {
                     const bookingDate = new Date(b.booking_date)
                     const weekAgo = new Date()
@@ -144,13 +144,13 @@ export const DashboardPage = () => {
                   }).length}
                 </p>
               </div>
-              <TrendingUp className="h-8 w-8 text-purple-400" />
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
@@ -167,13 +167,13 @@ export const DashboardPage = () => {
                 {upcomingClasses.map((cls) => (
                   <div
                     key={cls.id}
-                    className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/30"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-gray-800/50 rounded-lg border border-gray-700/30 space-y-2 sm:space-y-0"
                   >
-                    <div>
-                      <h3 className="font-semibold text-white">{cls.name}</h3>
-                      <p className="text-sm text-white/70">with {cls.instructor}</p>
-                      <div className="flex items-center text-sm text-white/60 mt-1">
-                        <Clock className="h-4 w-4 mr-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white text-sm sm:text-base">{cls.name}</h3>
+                      <p className="text-xs sm:text-sm text-white/70">with {cls.instructor}</p>
+                      <div className="flex items-center text-xs sm:text-sm text-white/60 mt-1">
+                        <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         {new Date(cls.datetime).toLocaleDateString()} at{' '}
                         {new Date(cls.datetime).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -181,9 +181,9 @@ export const DashboardPage = () => {
                         })}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center text-sm text-white/60 mb-2">
-                        <Users className="h-4 w-4 mr-1" />
+                    <div className="text-left sm:text-right">
+                      <div className="flex items-center text-xs sm:text-sm text-white/60">
+                        <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         {cls.current_bookings}/{cls.max_capacity}
                       </div>
                     </div>

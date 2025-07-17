@@ -171,13 +171,13 @@ export const BookingsPage = () => {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-gray-200 via-white to-gray-300 bg-clip-text text-transparent">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-gray-200 via-white to-gray-300 bg-clip-text text-transparent">
             My Hyrox Bookings
           </h1>
-          <p className="text-gray-300 text-lg">Manage your functional fitness class reservations</p>
-          <div className="mt-4 flex items-center space-x-4 text-sm text-gray-400">
+          <p className="text-gray-300 text-base sm:text-lg">Manage your functional fitness class reservations</p>
+          <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
             <span className="flex items-center">
               <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
               Running + Functional Training
@@ -189,47 +189,47 @@ export const BookingsPage = () => {
           </div>
         </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card className="bg-gradient-to-br from-gray-900/60 to-black/80 backdrop-blur-md border-gray-600/40 text-white hover:from-gray-800/70 hover:to-black/90 transition-all duration-300 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-300 text-sm">Upcoming Hyrox Sessions</p>
-                <p className="text-2xl font-bold text-white">{upcomingBookings.length}</p>
+                <p className="text-gray-300 text-xs sm:text-sm">Upcoming Hyrox Sessions</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{upcomingBookings.length}</p>
               </div>
               <div className="relative">
-                <Calendar className="h-8 w-8 text-gray-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gray-500 rounded-full animate-pulse"></div>
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-gray-500 rounded-full animate-pulse"></div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-gray-800/60 to-gray-900/80 backdrop-blur-md border-gray-500/40 text-white hover:from-gray-700/70 hover:to-gray-800/90 transition-all duration-300 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-300 text-sm">Completed Workouts</p>
-                <p className="text-2xl font-bold text-white">{pastBookings.length}</p>
+                <p className="text-gray-300 text-xs sm:text-sm">Completed Workouts</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{pastBookings.length}</p>
               </div>
               <div className="relative">
-                <CheckCircle className="h-8 w-8 text-gray-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gray-500 rounded-full"></div>
+                <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-gray-500 rounded-full"></div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-black/60 to-gray-900/80 backdrop-blur-md border-gray-700/40 text-white hover:from-gray-900/70 hover:to-gray-800/90 transition-all duration-300 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-300 text-sm">Total Training Sessions</p>
-                <p className="text-2xl font-bold text-white">{bookings.length}</p>
+                <p className="text-gray-300 text-xs sm:text-sm">Total Training Sessions</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{bookings.length}</p>
               </div>
               <div className="relative">
-                <Users className="h-8 w-8 text-gray-400" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gray-500 rounded-full animate-pulse"></div>
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-gray-500 rounded-full animate-pulse"></div>
               </div>
             </div>
           </CardContent>
@@ -237,12 +237,12 @@ export const BookingsPage = () => {
       </div>
 
       {upcomingBookings.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-            <div className="w-1 h-8 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full mr-3"></div>
-            Upcoming Hyrox Training Sessions
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+            <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full mr-2 sm:mr-3"></div>
+            <span className="text-base sm:text-xl lg:text-2xl">Upcoming Hyrox Training Sessions</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {upcomingBookings.map((booking) => {
               const StatusIcon = getStatusIcon(booking.status)
               if (!booking.class_info) return null
@@ -252,35 +252,35 @@ export const BookingsPage = () => {
                   key={booking.id}
                   className="bg-gradient-to-br from-gray-900/70 to-black/80 backdrop-blur-md border-gray-600/30 hover:border-gray-500/50 hover:from-gray-800/80 hover:to-black/90 transition-all duration-300 shadow-lg hover:shadow-gray-500/20"
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between space-y-2 sm:space-y-0">
                       <div className="flex-1">
-                        <CardTitle className="text-white text-lg mb-2">
+                        <CardTitle className="text-white text-base sm:text-lg mb-2">
                           {booking.class_info.name}
                         </CardTitle>
-                        <CardDescription className="text-white/70">
+                        <CardDescription className="text-white/70 text-sm">
                           with {booking.class_info.instructor}
                         </CardDescription>
                       </div>
-                      <Badge className={`${getStatusColor(booking.status)} text-white border-0`}>
+                      <Badge className={`${getStatusColor(booking.status)} text-white border-0 text-xs flex-shrink-0`}>
                         <StatusIcon className="h-3 w-3 mr-1" />
                         {booking.status}
                       </Badge>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
                     <div className="space-y-2">
                       <div className="flex items-center text-white/80">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span className="text-sm">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm">
                           {new Date(booking.class_info.datetime).toLocaleDateString()}
                         </span>
                       </div>
                       
                       <div className="flex items-center text-white/80">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span className="text-sm">
+                        <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm">
                           {new Date(booking.class_info.datetime).toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit'
@@ -289,15 +289,15 @@ export const BookingsPage = () => {
                       </div>
                       
                       <div className="flex items-center text-white/80">
-                        <Users className="h-4 w-4 mr-2" />
-                        <span className="text-sm">
+                        <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm">
                           {booking.class_info.current_bookings}/{booking.class_info.max_capacity} spots
                         </span>
                       </div>
                     </div>
 
                     <div className="pt-2">
-                      <p className="text-white/60 text-xs mb-3">
+                      <p className="text-white/60 text-xs mb-2 sm:mb-3">
                         Booked on {new Date(booking.booking_date).toLocaleDateString()}
                       </p>
                       
@@ -306,18 +306,18 @@ export const BookingsPage = () => {
                         disabled={cancelLoading === booking.id}
                         variant="destructive"
                         size="sm"
-                        className="w-full"
+                        className="w-full text-xs sm:text-sm py-2 sm:py-3"
                       >
                         {cancelLoading === booking.id ? (
-                          <div className="flex items-center">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                            Cancelling...
+                          <div className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2" />
+                            <span className="text-xs sm:text-sm">Cancelling...</span>
                           </div>
                         ) : (
-                          <>
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel Booking
-                          </>
+                          <div className="flex items-center justify-center">
+                            <X className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                            <span className="text-xs sm:text-sm">Cancel Booking</span>
+                          </div>
                         )}
                       </Button>
                     </div>
@@ -330,12 +330,12 @@ export const BookingsPage = () => {
       )}
 
       {pastBookings.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-            <div className="w-1 h-8 bg-gradient-to-b from-gray-600 to-gray-700 rounded-full mr-3"></div>
-            Completed Hyrox Sessions
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+            <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-gray-600 to-gray-700 rounded-full mr-2 sm:mr-3"></div>
+            <span className="text-base sm:text-xl lg:text-2xl">Completed Hyrox Sessions</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {pastBookings.slice(0, 6).map((booking) => {
               const StatusIcon = getStatusIcon('completed')
               if (!booking.class_info) return null
@@ -345,34 +345,34 @@ export const BookingsPage = () => {
                   key={booking.id}
                   className="bg-gradient-to-br from-gray-900/40 to-black/50 backdrop-blur-md border-gray-600/20 opacity-75 hover:opacity-90 transition-all duration-300"
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between space-y-2 sm:space-y-0">
                       <div className="flex-1">
-                        <CardTitle className="text-white text-lg mb-2">
+                        <CardTitle className="text-white text-base sm:text-lg mb-2">
                           {booking.class_info.name}
                         </CardTitle>
-                        <CardDescription className="text-white/70">
+                        <CardDescription className="text-white/70 text-sm">
                           with {booking.class_info.instructor}
                         </CardDescription>
                       </div>
-                      <Badge className="bg-blue-500 text-white border-0">
+                      <Badge className="bg-blue-500 text-white border-0 text-xs flex-shrink-0">
                         <StatusIcon className="h-3 w-3 mr-1" />
                         Completed
                       </Badge>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-2">
+                  <CardContent className="space-y-2 p-4 sm:p-6">
                     <div className="flex items-center text-white/60">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span className="text-sm">
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
                         {new Date(booking.class_info.datetime).toLocaleDateString()}
                       </span>
                     </div>
                     
                     <div className="flex items-center text-white/60">
-                      <Clock className="h-4 w-4 mr-2" />
-                      <span className="text-sm">
+                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm">
                         {new Date(booking.class_info.datetime).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit'
@@ -388,21 +388,21 @@ export const BookingsPage = () => {
       )}
 
       {bookings.length === 0 && (
-        <div className="text-center py-16">
-          <div className="relative mb-6">
-            <Calendar className="h-20 w-20 text-white/50 mx-auto" />
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center border border-gray-500">
+        <div className="text-center py-12 sm:py-16">
+          <div className="relative mb-4 sm:mb-6">
+            <Calendar className="h-16 w-16 sm:h-20 sm:w-20 text-white/50 mx-auto" />
+            <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center border border-gray-500">
               <span className="text-white text-xs font-bold">0</span>
             </div>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2 bg-gradient-to-r from-gray-200 to-white bg-clip-text text-transparent">
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 bg-gradient-to-r from-gray-200 to-white bg-clip-text text-transparent">
             Ready to Start Your Hyrox Journey?
           </h3>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto">
+          <p className="text-gray-400 mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base px-4">
             Book your first functional fitness session and join the Hyrox community. 
             Combine running with functional workouts for the ultimate challenge.
           </p>
-          <Button className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-300 border border-gray-600">
+          <Button className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold shadow-lg hover:shadow-gray-500/25 transition-all duration-300 border border-gray-600">
             Browse Hyrox Classes
           </Button>
         </div>
