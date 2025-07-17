@@ -61,7 +61,7 @@ export const LoginPage = () => {
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-white placeholder:text-gray-400 bg-gray-800/50 border-gray-600"
                   required
                 />
               </div>
@@ -74,7 +74,7 @@ export const LoginPage = () => {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-white placeholder:text-gray-400 bg-gray-800/50 border-gray-600"
                   required
                 />
               </div>
