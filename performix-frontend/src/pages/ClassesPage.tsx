@@ -1,0 +1,247 @@
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Calendar, Clock, Users, MapPin, Zap } from 'lucide-react'
+import { useToast } from '../hooks/use-toast'
+import axios from 'axios'
+
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+
+interface Class {
+  id: string
+  name: string
+  description: string
+  instructor: string
+  datetime: string
+  duration_minutes: number
+  max_capacity: number
+  current_bookings: number
+}
+
+interface Membership {
+  id: string
+  type: string
+  end_date: string
+  is_active: boolean
+}
+
+export const ClassesPage = () => {
+  const [classes, setClasses] = useState<Class[]>([])
+  const [membership, setMembership] = useState<Membership | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [bookingLoading, setBookingLoading] = useState<string | null>(null)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const classesRes = await axios.get(`${API_URL}/classes`)
+      setClasses(classesRes.data)
+
+      try {
+        const membershipRes = await axios.get(`${API_URL}/memberships/current`)
+        setMembership(membershipRes.data)
+      } catch (error) {
+        setMembership(null)
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load classes",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBookClass = async (classId: string) => {
+    if (!membership) {
+      toast({
+        title: "Membership Required",
+        description: "You need an active membership to book classes",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setBookingLoading(classId)
+    try {
+      await axios.post(`${API_URL}/bookings`, { class_id: classId })
+      toast({
+        title: "Class Booked!",
+        description: "You've successfully booked this class",
+      })
+      fetchData()
+    } catch (error: any) {
+      toast({
+        title: "Booking Failed",
+        description: error.response?.data?.detail || "Failed to book class",
+        variant: "destructive",
+      })
+    } finally {
+      setBookingLoading(null)
+    }
+  }
+
+  const getClassTypeColor = (name: string) => {
+    if (name.toLowerCase().includes('crossfit')) return 'bg-red-500'
+    if (name.toLowerCase().includes('yoga')) return 'bg-green-500'
+    if (name.toLowerCase().includes('hiit')) return 'bg-orange-500'
+    return 'bg-purple-500'
+  }
+
+  const getIntensityLevel = (name: string) => {
+    if (name.toLowerCase().includes('crossfit') || name.toLowerCase().includes('hiit')) return 'High'
+    if (name.toLowerCase().includes('yoga')) return 'Low'
+    return 'Medium'
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Available Classes</h1>
+        <p className="text-white/80">Book your next workout session</p>
+        
+        {!membership && (
+          <div className="mt-4 p-4 bg-orange-500/20 rounded-lg border border-orange-400/30">
+            <p className="text-orange-400 font-semibold">No Active Membership</p>
+            <p className="text-white/70 text-sm">
+              You need an active membership to book classes. Get one from the membership page.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {classes.map((cls) => {
+          const isUpcoming = new Date(cls.datetime) > new Date()
+          const isFull = cls.current_bookings >= cls.max_capacity
+          const canBook = membership && isUpcoming && !isFull
+
+          return (
+            <Card
+              key={cls.id}
+              className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-700 transition-all duration-300"
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-white text-lg mb-2">{cls.name}</CardTitle>
+                    <CardDescription className="text-white/70">
+                      {cls.description}
+                    </CardDescription>
+                  </div>
+                  <div className={`w-3 h-3 rounded-full ${getClassTypeColor(cls.name)}`} />
+                </div>
+                
+                <div className="flex items-center space-x-2 mt-3">
+                  <Badge 
+                    variant="secondary" 
+                    className={`${getClassTypeColor(cls.name)} text-white border-0`}
+                  >
+                    {getIntensityLevel(cls.name)} Intensity
+                  </Badge>
+                  <Badge variant="outline" className="text-white/80 border-white/30">
+                    {cls.duration_minutes} min
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center text-white/80">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    <span className="text-sm">Instructor: {cls.instructor}</span>
+                  </div>
+                  
+                  <div className="flex items-center text-white/80">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      {new Date(cls.datetime).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center text-white/80">
+                    <Clock className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      {new Date(cls.datetime).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center text-white/80">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      {cls.current_bookings}/{cls.max_capacity} spots filled
+                    </span>
+                  </div>
+                </div>
+
+                <div className="w-full bg-gray-700/50 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${(cls.current_bookings / cls.max_capacity) * 100}%`
+                    }}
+                  />
+                </div>
+
+                <Button
+                  onClick={() => handleBookClass(cls.id)}
+                  disabled={!canBook || bookingLoading === cls.id}
+                  className={`w-full ${
+                    canBook
+                      ? 'bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700'
+                      : 'bg-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {bookingLoading === cls.id ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Booking...
+                    </div>
+                  ) : !isUpcoming ? (
+                    'Class Ended'
+                  ) : isFull ? (
+                    'Class Full'
+                  ) : !membership ? (
+                    'Membership Required'
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Book Class
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+
+      {classes.length === 0 && (
+        <div className="text-center py-12">
+          <Calendar className="h-16 w-16 text-white/50 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Classes Available</h3>
+          <p className="text-white/70">Check back later for new classes</p>
+        </div>
+      )}
+    </div>
+  )
+}
