@@ -8,11 +8,13 @@ interface User {
   email: string
   full_name: string
   created_at: string
+  role?: string
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
+  isAdmin: boolean
   login: (email: string, password: string) => Promise<void>
   register: (email: string, password: string, fullName: string) => Promise<void>
   logout: () => void
@@ -35,6 +37,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  
+  const isAdmin = user?.role === 'admin'
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -126,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     user,
     loading,
+    isAdmin,
     login,
     register,
     logout

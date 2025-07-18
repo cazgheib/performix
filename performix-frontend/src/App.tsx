@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ClassesPage } from './pages/ClassesPage'
 import { MembershipPage } from './pages/MembershipPage'
 import { BookingsPage } from './pages/BookingsPage'
+import { AdminPage } from './pages/AdminPage'
 import { Toaster } from '@/components/ui/toaster'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890abcdef')
@@ -96,6 +97,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BookingsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               } 
             />

@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-SECRET_KEY = "your-secret-key-here-change-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -32,10 +32,44 @@ warnings.filterwarnings("ignore", message=".*bcrypt.*__about__.*")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-users_db = {}
+admin_user_id = "admin-001"
+users_db = {
+    admin_user_id: {
+        "id": admin_user_id,
+        "email": "admin@performix.com",
+        "full_name": "Admin User",
+        "hashed_password": "",
+        "created_at": datetime.utcnow(),
+        "role": "admin"
+    }
+}
 memberships_db = {}
 classes_db = {}
 bookings_db = {}
+
+class AppSettings(BaseModel):
+    id: str
+    key: str
+    value: str
+    category: str
+    description: Optional[str] = None
+
+settings_db = {
+    "theme-primary": {
+        "id": "theme-primary",
+        "key": "theme_primary_color",
+        "value": "#000000",
+        "category": "theme",
+        "description": "Primary theme color"
+    },
+    "theme-background": {
+        "id": "theme-background", 
+        "key": "background_image_url",
+        "value": "",
+        "category": "theme",
+        "description": "Background image URL"
+    }
+}
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -51,6 +85,7 @@ class User(BaseModel):
     email: str
     full_name: str
     created_at: datetime
+    role: Optional[str] = "user"
 
 class MembershipCreate(BaseModel):
     type: str  # "daily", "weekly", "monthly"
@@ -148,6 +183,14 @@ def get_active_membership(user_id: str) -> Optional[Membership]:
             return membership
     return None
 
+def get_admin_user(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user
+
 def init_sample_data():
     class_types = [
         {"name": "Morning CrossFit", "description": "High-intensity functional fitness workout", "instructor": "Sarah Johnson", "duration": 60, "capacity": 20},
@@ -188,6 +231,8 @@ def init_sample_data():
 
 init_sample_data()
 
+users_db[admin_user_id]["hashed_password"] = get_password_hash(os.getenv("ADMIN_PASSWORD"))
+
 @app.post("/auth/register", response_model=Token)
 async def register(user_data: UserCreate):
     try:
@@ -208,7 +253,8 @@ async def register(user_data: UserCreate):
             "email": user_data.email,
             "full_name": user_data.full_name,
             "hashed_password": hashed_password,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.utcnow(),
+            "role": "user"
         }
         
         users_db[user_id] = user
@@ -262,7 +308,8 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         id=current_user["id"],
         email=current_user["email"],
         full_name=current_user["full_name"],
-        created_at=current_user["created_at"]
+        created_at=current_user["created_at"],
+        role=current_user.get("role", "user")
     )
 
 @app.post("/create-payment-intent", response_model=PaymentIntentResponse)
@@ -408,6 +455,147 @@ async def cancel_booking(booking_id: str, current_user: dict = Depends(get_curre
     del bookings_db[booking_id]
     
     return {"message": "Booking cancelled successfully"}
+
+@app.get("/admin/users", response_model=List[User])
+async def admin_get_users(admin_user: dict = Depends(get_admin_user)):
+    return [User(**{k: v for k, v in user.items() if k != "hashed_password"}) 
+            for user in users_db.values()]
+
+@app.post("/admin/users", response_model=User)
+async def admin_create_user(user_data: UserCreate, admin_user: dict = Depends(get_admin_user)):
+    if user_data.email in [u["email"] for u in users_db.values()]:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user_id = str(uuid.uuid4())
+    hashed_password = get_password_hash(user_data.password)
+    
+    user = {
+        "id": user_id,
+        "email": user_data.email,
+        "full_name": user_data.full_name,
+        "hashed_password": hashed_password,
+        "created_at": datetime.utcnow(),
+        "role": "user"
+    }
+    
+    users_db[user_id] = user
+    return User(**{k: v for k, v in user.items() if k != "hashed_password"})
+
+@app.put("/admin/users/{user_id}", response_model=User)
+async def admin_update_user(user_id: str, user_data: UserCreate, admin_user: dict = Depends(get_admin_user)):
+    if user_id not in users_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = users_db[user_id]
+    user.update({
+        "email": user_data.email,
+        "full_name": user_data.full_name,
+        "hashed_password": get_password_hash(user_data.password)
+    })
+    
+    return User(**{k: v for k, v in user.items() if k != "hashed_password"})
+
+@app.delete("/admin/users/{user_id}")
+async def admin_delete_user(user_id: str, admin_user: dict = Depends(get_admin_user)):
+    if user_id not in users_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if users_db[user_id].get("role") == "admin":
+        raise HTTPException(status_code=400, detail="Cannot delete admin user")
+    
+    del users_db[user_id]
+    return {"message": "User deleted successfully"}
+
+@app.get("/admin/classes", response_model=List[Class])
+async def admin_get_classes(admin_user: dict = Depends(get_admin_user)):
+    return [Class(**class_data) for class_data in classes_db.values()]
+
+@app.post("/admin/classes", response_model=Class)
+async def admin_create_class(class_data: ClassCreate, admin_user: dict = Depends(get_admin_user)):
+    class_id = str(uuid.uuid4())
+    new_class = {
+        "id": class_id,
+        "name": class_data.name,
+        "description": class_data.description,
+        "instructor": class_data.instructor,
+        "datetime": class_data.datetime,
+        "duration_minutes": class_data.duration_minutes,
+        "max_capacity": class_data.max_capacity,
+        "current_bookings": 0
+    }
+    
+    classes_db[class_id] = new_class
+    return Class(**new_class)
+
+@app.put("/admin/classes/{class_id}", response_model=Class)
+async def admin_update_class(class_id: str, class_data: ClassCreate, admin_user: dict = Depends(get_admin_user)):
+    if class_id not in classes_db:
+        raise HTTPException(status_code=404, detail="Class not found")
+    
+    classes_db[class_id].update({
+        "name": class_data.name,
+        "description": class_data.description,
+        "instructor": class_data.instructor,
+        "datetime": class_data.datetime,
+        "duration_minutes": class_data.duration_minutes,
+        "max_capacity": class_data.max_capacity
+    })
+    
+    return Class(**classes_db[class_id])
+
+@app.delete("/admin/classes/{class_id}")
+async def admin_delete_class(class_id: str, admin_user: dict = Depends(get_admin_user)):
+    if class_id not in classes_db:
+        raise HTTPException(status_code=404, detail="Class not found")
+    
+    for booking in list(bookings_db.values()):
+        if booking["class_id"] == class_id:
+            del bookings_db[booking["id"]]
+    
+    del classes_db[class_id]
+    return {"message": "Class deleted successfully"}
+
+@app.get("/admin/memberships", response_model=List[Membership])
+async def admin_get_memberships(admin_user: dict = Depends(get_admin_user)):
+    return [Membership(**membership) for membership in memberships_db.values()]
+
+@app.get("/admin/bookings", response_model=List[Booking])
+async def admin_get_bookings(admin_user: dict = Depends(get_admin_user)):
+    return [Booking(**booking) for booking in bookings_db.values()]
+
+@app.delete("/admin/bookings/{booking_id}")
+async def admin_cancel_booking(booking_id: str, admin_user: dict = Depends(get_admin_user)):
+    if booking_id not in bookings_db:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    booking = bookings_db[booking_id]
+    classes_db[booking["class_id"]]["current_bookings"] -= 1
+    del bookings_db[booking_id]
+    
+    return {"message": "Booking cancelled successfully"}
+
+@app.get("/admin/settings", response_model=List[AppSettings])
+async def admin_get_settings(admin_user: dict = Depends(get_admin_user)):
+    return [AppSettings(**setting) for setting in settings_db.values()]
+
+@app.put("/admin/settings/{setting_id}", response_model=AppSettings)
+async def admin_update_setting(setting_id: str, value: str, admin_user: dict = Depends(get_admin_user)):
+    if setting_id not in settings_db:
+        raise HTTPException(status_code=404, detail="Setting not found")
+    
+    settings_db[setting_id]["value"] = value
+    return AppSettings(**settings_db[setting_id])
+
+@app.get("/admin/dashboard")
+async def admin_get_dashboard(admin_user: dict = Depends(get_admin_user)):
+    return {
+        "total_users": len(users_db),
+        "total_classes": len(classes_db),
+        "total_memberships": len(memberships_db),
+        "total_bookings": len(bookings_db),
+        "active_memberships": len([m for m in memberships_db.values() if m["is_active"]]),
+        "recent_bookings": sorted(bookings_db.values(), key=lambda x: x["booking_date"], reverse=True)[:5]
+    }
 
 @app.get("/healthz")
 async def healthz():

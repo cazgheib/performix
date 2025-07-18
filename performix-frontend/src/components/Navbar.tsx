@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Link, useLocation } from 'react-router-dom'
-import { Dumbbell, User, LogOut, Calendar, CreditCard, BookOpen, Menu, X } from 'lucide-react'
+import { Dumbbell, User, LogOut, Calendar, CreditCard, BookOpen, Menu, X, Settings } from 'lucide-react'
 
 export const Navbar = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, isAdmin } = useAuth()
   const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -18,6 +18,7 @@ export const Navbar = () => {
     { path: '/classes', label: 'Classes', icon: Calendar },
     { path: '/membership', label: 'Membership', icon: CreditCard },
     { path: '/bookings', label: 'My Bookings', icon: BookOpen },
+    ...(isAdmin ? [{ path: '/admin', label: 'Admin', icon: Settings }] : []),
   ]
 
   const toggleMobileMenu = () => {
