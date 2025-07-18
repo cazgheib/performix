@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -231,7 +231,7 @@ def init_sample_data():
 
 init_sample_data()
 
-users_db[admin_user_id]["hashed_password"] = get_password_hash(os.getenv("ADMIN_PASSWORD"))
+users_db[admin_user_id]["hashed_password"] = get_password_hash(os.getenv("ADMIN_PASSWORD", "admin123"))
 
 @app.post("/auth/register", response_model=Token)
 async def register(user_data: UserCreate):
