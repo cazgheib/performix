@@ -147,38 +147,39 @@ def get_active_membership(user_id: str) -> Optional[Membership]:
     return None
 
 def init_sample_data():
-    sample_classes = [
-        {
-            "id": str(uuid.uuid4()),
-            "name": "Morning CrossFit",
-            "description": "High-intensity functional fitness workout",
-            "instructor": "Sarah Johnson",
-            "datetime": datetime.utcnow() + timedelta(days=1, hours=8),
-            "duration_minutes": 60,
-            "max_capacity": 20,
-            "current_bookings": 0
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "name": "Yoga Flow",
-            "description": "Relaxing vinyasa flow session",
-            "instructor": "Mike Chen",
-            "datetime": datetime.utcnow() + timedelta(days=1, hours=18),
-            "duration_minutes": 75,
-            "max_capacity": 15,
-            "current_bookings": 0
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "name": "HIIT Training",
-            "description": "High-intensity interval training",
-            "instructor": "Alex Rodriguez",
-            "datetime": datetime.utcnow() + timedelta(days=2, hours=10),
-            "duration_minutes": 45,
-            "max_capacity": 25,
-            "current_bookings": 0
-        }
+    class_types = [
+        {"name": "Morning CrossFit", "description": "High-intensity functional fitness workout", "instructor": "Sarah Johnson", "duration": 60, "capacity": 20},
+        {"name": "Yoga Flow", "description": "Relaxing vinyasa flow session", "instructor": "Mike Chen", "duration": 75, "capacity": 15},
+        {"name": "HIIT Training", "description": "High-intensity interval training", "instructor": "Alex Rodriguez", "duration": 45, "capacity": 25},
+        {"name": "Strength Training", "description": "Build muscle and increase power", "instructor": "Emma Wilson", "duration": 90, "capacity": 18},
+        {"name": "Cardio Blast", "description": "Heart-pumping cardio workout", "instructor": "David Kim", "duration": 50, "capacity": 22},
+        {"name": "Pilates Core", "description": "Core strengthening and flexibility", "instructor": "Lisa Martinez", "duration": 60, "capacity": 12},
+        {"name": "Boxing Fitness", "description": "Combat-inspired fitness training", "instructor": "Marcus Thompson", "duration": 55, "capacity": 16}
     ]
+    
+    time_slots = [6, 8, 10, 12, 14, 16, 18, 20]  # Hours of the day
+    
+    sample_classes = []
+    
+    for day in range(7):
+        classes_per_day = 2 + (day % 3)  # Varies between 2-4 classes
+        
+        for i in range(classes_per_day):
+            class_type = class_types[(day * classes_per_day + i) % len(class_types)]
+            time_slot = time_slots[i % len(time_slots)]
+            
+            class_datetime = datetime.utcnow() + timedelta(days=day, hours=time_slot)
+            
+            sample_classes.append({
+                "id": str(uuid.uuid4()),
+                "name": class_type["name"],
+                "description": class_type["description"],
+                "instructor": class_type["instructor"],
+                "datetime": class_datetime,
+                "duration_minutes": class_type["duration"],
+                "max_capacity": class_type["capacity"],
+                "current_bookings": 0
+            })
     
     for class_data in sample_classes:
         classes_db[class_data["id"]] = class_data

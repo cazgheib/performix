@@ -60,6 +60,42 @@ export const ClassesPage = () => {
     }
   }
 
+  const getNext7Days = () => {
+    const days = []
+    for (let i = 0; i < 7; i++) {
+      const date = new Date()
+      date.setDate(date.getDate() + i)
+      days.push(date)
+    }
+    return days
+  }
+
+  const groupClassesByDay = () => {
+    const next7Days = getNext7Days()
+    const groupedClasses: { [key: string]: Class[] } = {}
+    
+    next7Days.forEach(day => {
+      const dayKey = day.toDateString()
+      groupedClasses[dayKey] = []
+    })
+
+    classes.forEach(cls => {
+      const classDate = new Date(cls.datetime)
+      const dayKey = classDate.toDateString()
+      if (groupedClasses[dayKey]) {
+        groupedClasses[dayKey].push(cls)
+      }
+    })
+
+    Object.keys(groupedClasses).forEach(day => {
+      groupedClasses[day].sort((a, b) => 
+        new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+      )
+    })
+
+    return groupedClasses
+  }
+
   const handleBookClass = async (classId: string) => {
     if (!membership) {
       toast({
@@ -110,10 +146,13 @@ export const ClassesPage = () => {
     )
   }
 
+  const groupedClasses = groupClassesByDay()
+  const next7Days = getNext7Days()
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Available Classes</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">7-Day Class Schedule</h1>
         <p className="text-white/80 text-sm sm:text-base">Book your next workout session</p>
         
         {!membership && (
@@ -126,122 +165,142 @@ export const ClassesPage = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {classes.map((cls) => {
-          const isUpcoming = new Date(cls.datetime) > new Date()
-          const isFull = cls.current_bookings >= cls.max_capacity
-          const canBook = membership && isUpcoming && !isFull
+      <div className="space-y-6">
+        {next7Days.map((day) => {
+          const dayKey = day.toDateString()
+          const dayClasses = groupedClasses[dayKey] || []
+          const isToday = day.toDateString() === new Date().toDateString()
+          const dayName = day.toLocaleDateString('en-US', { weekday: 'long' })
+          const dayDate = day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 
           return (
-            <Card
-              key={cls.id}
-              className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-700 transition-all duration-300"
-            >
-              <CardHeader className="p-4 sm:p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-white text-base sm:text-lg mb-2">{cls.name}</CardTitle>
-                    <CardDescription className="text-white/70 text-sm">
-                      {cls.description}
-                    </CardDescription>
-                  </div>
-                  <div className={`w-3 h-3 rounded-full ${getClassTypeColor(cls.name)} flex-shrink-0`} />
+            <div key={dayKey} className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className={`px-4 py-2 rounded-lg ${isToday ? 'bg-blue-600' : 'bg-gray-700'}`}>
+                  <h2 className="text-lg sm:text-xl font-bold text-white">
+                    {dayName}
+                  </h2>
+                  <p className="text-white/80 text-sm">{dayDate}</p>
+                  {isToday && <p className="text-blue-200 text-xs">Today</p>}
                 </div>
-                
-                <div className="flex flex-wrap items-center gap-2 mt-3">
-                  <Badge 
-                    variant="secondary" 
-                    className={`${getClassTypeColor(cls.name)} text-white border-0 text-xs`}
-                  >
-                    {getIntensityLevel(cls.name)} Intensity
-                  </Badge>
-                  <Badge variant="outline" className="text-white/80 border-white/30 text-xs">
-                    {cls.duration_minutes} min
-                  </Badge>
+                <div className="flex-1 h-px bg-gray-700"></div>
+                <div className="text-white/60 text-sm">
+                  {dayClasses.length} {dayClasses.length === 1 ? 'class' : 'classes'}
                 </div>
-              </CardHeader>
+              </div>
 
-              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
-                <div className="space-y-2">
-                  <div className="flex items-center text-white/80">
-                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm">Instructor: {cls.instructor}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-white/80">
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm">
-                      {new Date(cls.datetime).toLocaleDateString()}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center text-white/80">
-                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm">
-                      {new Date(cls.datetime).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center text-white/80">
-                    <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm">
-                      {cls.current_bookings}/{cls.max_capacity} spots filled
-                    </span>
-                  </div>
+              {dayClasses.length === 0 ? (
+                <div className="text-center py-8 bg-gray-800/30 rounded-lg border border-gray-700/50">
+                  <Calendar className="h-8 w-8 text-white/30 mx-auto mb-2" />
+                  <p className="text-white/50 text-sm">No classes scheduled for this day</p>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {dayClasses.map((cls) => {
+                    const isUpcoming = new Date(cls.datetime) > new Date()
+                    const isFull = cls.current_bookings >= cls.max_capacity
+                    const canBook = membership && isUpcoming && !isFull
 
-                <div className="w-full bg-gray-700/50 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${(cls.current_bookings / cls.max_capacity) * 100}%`
-                    }}
-                  />
+                    return (
+                      <Card
+                        key={cls.id}
+                        className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-700 transition-all duration-300"
+                      >
+                        <CardHeader className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <CardTitle className="text-white text-base mb-1">{cls.name}</CardTitle>
+                              <CardDescription className="text-white/70 text-sm">
+                                {cls.description}
+                              </CardDescription>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full ${getClassTypeColor(cls.name)} flex-shrink-0`} />
+                          </div>
+                          
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <Badge 
+                              variant="secondary" 
+                              className={`${getClassTypeColor(cls.name)} text-white border-0 text-xs`}
+                            >
+                              {getIntensityLevel(cls.name)} Intensity
+                            </Badge>
+                            <Badge variant="outline" className="text-white/80 border-white/30 text-xs">
+                              {cls.duration_minutes} min
+                            </Badge>
+                          </div>
+                        </CardHeader>
+
+                        <CardContent className="space-y-3 p-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center text-white/80">
+                              <MapPin className="h-3 w-3 mr-2 flex-shrink-0" />
+                              <span className="text-xs">Instructor: {cls.instructor}</span>
+                            </div>
+                            
+                            <div className="flex items-center text-white/80">
+                              <Clock className="h-3 w-3 mr-2 flex-shrink-0" />
+                              <span className="text-xs">
+                                {new Date(cls.datetime).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center text-white/80">
+                              <Users className="h-3 w-3 mr-2 flex-shrink-0" />
+                              <span className="text-xs">
+                                {cls.current_bookings}/{cls.max_capacity} spots filled
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="w-full bg-gray-700/50 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${(cls.current_bookings / cls.max_capacity) * 100}%`
+                              }}
+                            />
+                          </div>
+
+                          <Button
+                            onClick={() => handleBookClass(cls.id)}
+                            disabled={!canBook || bookingLoading === cls.id}
+                            className={`w-full text-sm py-2 ${
+                              canBook
+                                ? 'bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700'
+                                : 'bg-gray-500 cursor-not-allowed'
+                            }`}
+                          >
+                            {bookingLoading === cls.id ? (
+                              <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2" />
+                                <span className="text-xs">Booking...</span>
+                              </div>
+                            ) : !isUpcoming ? (
+                              <span className="text-xs">Class Ended</span>
+                            ) : isFull ? (
+                              <span className="text-xs">Class Full</span>
+                            ) : !membership ? (
+                              <span className="text-xs">Membership Required</span>
+                            ) : (
+                              <div className="flex items-center justify-center">
+                                <Zap className="h-3 w-3 mr-2" />
+                                <span className="text-xs">Book Class</span>
+                              </div>
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
-
-                <Button
-                  onClick={() => handleBookClass(cls.id)}
-                  disabled={!canBook || bookingLoading === cls.id}
-                  className={`w-full text-sm sm:text-base py-2 sm:py-3 ${
-                    canBook
-                      ? 'bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700'
-                      : 'bg-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {bookingLoading === cls.id ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2" />
-                      <span className="text-xs sm:text-sm">Booking...</span>
-                    </div>
-                  ) : !isUpcoming ? (
-                    <span className="text-xs sm:text-sm">Class Ended</span>
-                  ) : isFull ? (
-                    <span className="text-xs sm:text-sm">Class Full</span>
-                  ) : !membership ? (
-                    <span className="text-xs sm:text-sm">Membership Required</span>
-                  ) : (
-                    <div className="flex items-center justify-center">
-                      <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      <span className="text-xs sm:text-sm">Book Class</span>
-                    </div>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           )
         })}
       </div>
-
-      {classes.length === 0 && (
-        <div className="text-center py-8 sm:py-12">
-          <Calendar className="h-12 w-12 sm:h-16 sm:w-16 text-white/50 mx-auto mb-4" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Classes Available</h3>
-          <p className="text-white/70 text-sm sm:text-base">Check back later for new classes</p>
-        </div>
-      )}
     </div>
   )
 }
