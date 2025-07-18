@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check, Crown, Zap, Calendar } from 'lucide-react'
 import { useToast } from '../hooks/use-toast'
+import { PaymentForm } from '../components/PaymentForm'
 import axios from 'axios'
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
@@ -76,6 +77,9 @@ export const MembershipPage = () => {
   const [currentMembership, setCurrentMembership] = useState<Membership | null>(null)
   const [loading, setLoading] = useState(true)
   const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [clientSecret, setClientSecret] = useState<string>('')
   const { toast } = useToast()
 
   useEffect(() => {
@@ -96,16 +100,23 @@ export const MembershipPage = () => {
   const handlePurchaseMembership = async (type: string) => {
     setPurchaseLoading(type)
     try {
-      await axios.post(`${API_URL}/memberships`, { type })
-      toast({
-        title: "Membership Activated!",
-        description: `Your ${type} membership is now active`,
+      const plan = membershipPlans.find(p => p.type === type)
+      if (!plan) return
+
+      const amount = parseInt(plan.price.replace('$', '')) * 100
+
+      const response = await axios.post(`${API_URL}/create-payment-intent`, {
+        amount,
+        membership_type: type
       })
-      fetchCurrentMembership()
+
+      setClientSecret(response.data.client_secret)
+      setSelectedPlan(plan)
+      setShowPaymentForm(true)
     } catch (error: any) {
       toast({
-        title: "Purchase Failed",
-        description: error.response?.data?.detail || "Failed to purchase membership",
+        title: "Payment Setup Failed",
+        description: error.response?.data?.detail || "Failed to setup payment",
         variant: "destructive",
       })
     } finally {
@@ -113,10 +124,55 @@ export const MembershipPage = () => {
     }
   }
 
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      await axios.post(`${API_URL}/memberships`, { 
+        type: selectedPlan.type,
+        payment_intent_id: paymentIntentId
+      })
+      
+      toast({
+        title: "Membership Activated!",
+        description: `Your ${selectedPlan.name} membership is now active`,
+      })
+      
+      setShowPaymentForm(false)
+      setSelectedPlan(null)
+      setClientSecret('')
+      fetchCurrentMembership()
+    } catch (error: any) {
+      toast({
+        title: "Activation Failed",
+        description: error.response?.data?.detail || "Failed to activate membership",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handlePaymentCancel = () => {
+    setShowPaymentForm(false)
+    setSelectedPlan(null)
+    setClientSecret('')
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300"></div>
+      </div>
+    )
+  }
+
+  if (showPaymentForm && selectedPlan && clientSecret) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
+        <PaymentForm
+          clientSecret={clientSecret}
+          amount={parseInt(selectedPlan.price.replace('$', '')) * 100}
+          membershipType={selectedPlan.name}
+          onSuccess={handlePaymentSuccess}
+          onCancel={handlePaymentCancel}
+        />
       </div>
     )
   }
