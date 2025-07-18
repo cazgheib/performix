@@ -219,9 +219,9 @@ export const ClassesPage = () => {
                 onClick={handlePreviousDay}
                 variant="outline"
                 size="sm"
-                className="border-gray-600 text-white hover:bg-gray-700"
+                className="border-gray-600 text-white hover:bg-gray-700 bg-gray-800/50"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 text-white" />
               </Button>
               
               <div className="text-center min-w-[120px]">
@@ -235,9 +235,9 @@ export const ClassesPage = () => {
                 onClick={handleNextDay}
                 variant="outline"
                 size="sm"
-                className="border-gray-600 text-white hover:bg-gray-700"
+                className="border-gray-600 text-white hover:bg-gray-700 bg-gray-800/50"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 text-white" />
               </Button>
             </div>
           </div>
