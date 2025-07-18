@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, Users, MapPin, Zap } from 'lucide-react'
+import { Calendar, Clock, Users, MapPin, Zap, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useToast } from '../hooks/use-toast'
 import axios from 'axios'
 
@@ -31,6 +31,7 @@ export const ClassesPage = () => {
   const [membership, setMembership] = useState<Membership | null>(null)
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState<string | null>(null)
+  const [weekOffset, setWeekOffset] = useState(0) // 0 = current week, 1 = next week, -1 = previous week
   const { toast } = useToast()
 
   useEffect(() => {
@@ -60,21 +61,24 @@ export const ClassesPage = () => {
     }
   }
 
-  const getNext7Days = () => {
+  const get7DaysForWeek = () => {
     const days = []
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() + (weekOffset * 7))
+    
     for (let i = 0; i < 7; i++) {
-      const date = new Date()
-      date.setDate(date.getDate() + i)
+      const date = new Date(startDate)
+      date.setDate(startDate.getDate() + i)
       days.push(date)
     }
     return days
   }
 
   const groupClassesByDay = () => {
-    const next7Days = getNext7Days()
+    const weekDays = get7DaysForWeek()
     const groupedClasses: { [key: string]: Class[] } = {}
     
-    next7Days.forEach(day => {
+    weekDays.forEach((day: Date) => {
       const dayKey = day.toDateString()
       groupedClasses[dayKey] = []
     })
@@ -147,13 +151,85 @@ export const ClassesPage = () => {
   }
 
   const groupedClasses = groupClassesByDay()
-  const next7Days = getNext7Days()
+  const weekDays = get7DaysForWeek()
+  
+  const getWeekTitle = () => {
+    const startDate = weekDays[0]
+    const endDate = weekDays[6]
+    
+    if (weekOffset === 0) {
+      return "This Week"
+    } else if (weekOffset === 1) {
+      return "Next Week"
+    } else if (weekOffset === -1) {
+      return "Last Week"
+    } else {
+      return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+    }
+  }
+
+  const handlePreviousWeek = () => {
+    setWeekOffset(prev => prev - 1)
+  }
+
+  const handleNextWeek = () => {
+    setWeekOffset(prev => prev + 1)
+  }
+
+  const handleCurrentWeek = () => {
+    setWeekOffset(0)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">7-Day Class Schedule</h1>
-        <p className="text-white/80 text-sm sm:text-base">Book your next workout session</p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">7-Day Class Schedule</h1>
+            <p className="text-white/80 text-sm sm:text-base">Book your next workout session</p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={handlePreviousWeek}
+              variant="outline"
+              size="sm"
+              className="border-gray-600 text-white hover:bg-gray-700"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="text-center min-w-[120px]">
+              <div className="text-white font-semibold text-sm">{getWeekTitle()}</div>
+              <div className="text-white/60 text-xs">
+                {weekDays[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {weekDays[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </div>
+            </div>
+            
+            <Button
+              onClick={handleNextWeek}
+              variant="outline"
+              size="sm"
+              className="border-gray-600 text-white hover:bg-gray-700"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        {weekOffset !== 0 && (
+          <div className="flex justify-center mb-4">
+            <Button
+              onClick={handleCurrentWeek}
+              variant="outline"
+              size="sm"
+              className="border-blue-500 text-blue-400 hover:bg-blue-500/20"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Back to This Week
+            </Button>
+          </div>
+        )}
         
         {!membership && (
           <div className="mt-4 p-3 sm:p-4 bg-orange-500/20 rounded-lg border border-orange-400/30">
@@ -166,22 +242,28 @@ export const ClassesPage = () => {
       </div>
 
       <div className="space-y-6">
-        {next7Days.map((day) => {
+        {weekDays.map((day: Date) => {
           const dayKey = day.toDateString()
           const dayClasses = groupedClasses[dayKey] || []
           const isToday = day.toDateString() === new Date().toDateString()
+          const isPast = day < new Date() && !isToday
           const dayName = day.toLocaleDateString('en-US', { weekday: 'long' })
           const dayDate = day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 
           return (
             <div key={dayKey} className="space-y-4">
               <div className="flex items-center space-x-3">
-                <div className={`px-4 py-2 rounded-lg ${isToday ? 'bg-blue-600' : 'bg-gray-700'}`}>
+                <div className={`px-4 py-2 rounded-lg ${
+                  isToday ? 'bg-blue-600' : 
+                  isPast ? 'bg-gray-600/50' : 
+                  'bg-gray-700'
+                }`}>
                   <h2 className="text-lg sm:text-xl font-bold text-white">
                     {dayName}
                   </h2>
                   <p className="text-white/80 text-sm">{dayDate}</p>
                   {isToday && <p className="text-blue-200 text-xs">Today</p>}
+                  {isPast && <p className="text-gray-400 text-xs">Past</p>}
                 </div>
                 <div className="flex-1 h-px bg-gray-700"></div>
                 <div className="text-white/60 text-sm">
@@ -197,7 +279,8 @@ export const ClassesPage = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {dayClasses.map((cls) => {
-                    const isUpcoming = new Date(cls.datetime) > new Date()
+                    const classDateTime = new Date(cls.datetime)
+                    const isUpcoming = classDateTime > new Date()
                     const isFull = cls.current_bookings >= cls.max_capacity
                     const canBook = membership && isUpcoming && !isFull
 
