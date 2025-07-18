@@ -59,30 +59,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const login = async (email: string, password: string) => {
-    const response = await axios.post(`${API_URL}/auth/login`, {
-      email,
-      password
-    })
-    
-    const { access_token } = response.data
-    localStorage.setItem('token', access_token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-    
-    await fetchUser()
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password
+      })
+      
+      const { access_token } = response.data
+      localStorage.setItem('token', access_token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+      
+      await fetchUser()
+    } catch (error: any) {
+      console.error('Login error:', error)
+      if (error.response?.data?.detail) {
+        throw new Error(error.response.data.detail)
+      } else if (error.response?.status === 401) {
+        throw new Error('Incorrect email or password.')
+      } else if (error.response?.status === 400) {
+        throw new Error('Login failed. Please check your information.')
+      } else if (error.response?.status >= 500) {
+        throw new Error('Server error. Please try again later.')
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        throw new Error('Network error. Please check your connection.')
+      } else {
+        throw new Error('Login failed. Please try again.')
+      }
+    }
   }
 
   const register = async (email: string, password: string, fullName: string) => {
-    const response = await axios.post(`${API_URL}/auth/register`, {
-      email,
-      password,
-      full_name: fullName
-    })
-    
-    const { access_token } = response.data
-    localStorage.setItem('token', access_token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-    
-    await fetchUser()
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        email,
+        password,
+        full_name: fullName
+      })
+      
+      const { access_token } = response.data
+      localStorage.setItem('token', access_token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+      
+      await fetchUser()
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      if (error.response?.data?.detail) {
+        throw new Error(error.response.data.detail)
+      } else if (error.response?.status === 400) {
+        throw new Error('Registration failed. Please check your information.')
+      } else if (error.response?.status >= 500) {
+        throw new Error('Server error. Please try again later.')
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        throw new Error('Network error. Please check your connection.')
+      } else {
+        throw new Error('Registration failed. Please try again.')
+      }
+    }
   }
 
   const logout = () => {

@@ -25,9 +25,10 @@ export const LoginPage = () => {
         description: "You've successfully logged in.",
       })
     } catch (error: any) {
+      console.error('Login error:', error)
       toast({
         title: "Login failed",
-        description: error.response?.data?.detail || "Invalid email or password",
+        description: error.message || "Something went wrong",
         variant: "destructive",
       })
     } finally {

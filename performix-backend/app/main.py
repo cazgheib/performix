@@ -9,6 +9,7 @@ from passlib.context import CryptContext
 import uuid
 import stripe
 import os
+import warnings
 
 app = FastAPI(title="Performix API", description="Book my wood - Advanced class booking system")
 
@@ -27,6 +28,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
+warnings.filterwarnings("ignore", message=".*bcrypt.*__about__.*")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
@@ -188,48 +190,71 @@ init_sample_data()
 
 @app.post("/auth/register", response_model=Token)
 async def register(user_data: UserCreate):
-    if user_data.email in [u["email"] for u in users_db.values()]:
-        raise HTTPException(status_code=400, detail="Email already registered")
+    try:
+        if user_data.email in [u["email"] for u in users_db.values()]:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        if not user_data.email or not user_data.password or not user_data.full_name:
+            raise HTTPException(status_code=400, detail="All fields are required")
+        
+        if len(user_data.password) < 6:
+            raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+        
+        user_id = str(uuid.uuid4())
+        hashed_password = get_password_hash(user_data.password)
+        
+        user = {
+            "id": user_id,
+            "email": user_data.email,
+            "full_name": user_data.full_name,
+            "hashed_password": hashed_password,
+            "created_at": datetime.utcnow()
+        }
+        
+        users_db[user_id] = user
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user_id}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
     
-    user_id = str(uuid.uuid4())
-    hashed_password = get_password_hash(user_data.password)
-    
-    user = {
-        "id": user_id,
-        "email": user_data.email,
-        "full_name": user_data.full_name,
-        "hashed_password": hashed_password,
-        "created_at": datetime.utcnow()
-    }
-    
-    users_db[user_id] = user
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user_id}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Registration error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error during registration")
 
 @app.post("/auth/login", response_model=Token)
 async def login(user_data: UserLogin):
-    user = None
-    for u in users_db.values():
-        if u["email"] == user_data.email:
-            user = u
-            break
-    
-    if not user or not verify_password(user_data.password, user["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        if not user_data.email or not user_data.password:
+            raise HTTPException(status_code=400, detail="Email and password are required")
+        
+        user = None
+        for u in users_db.values():
+            if u["email"] == user_data.email:
+                user = u
+                break
+        
+        if not user or not verify_password(user_data.password, user["hashed_password"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user["id"]}, expires_delta=access_token_expires
         )
+        return {"access_token": access_token, "token_type": "bearer"}
     
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user["id"]}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error during login")
 
 @app.get("/auth/me", response_model=User)
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):

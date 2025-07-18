@@ -26,9 +26,10 @@ export const RegisterPage = () => {
         description: "Your account has been created successfully.",
       })
     } catch (error: any) {
+      console.error('Registration error:', error)
       toast({
         title: "Registration failed",
-        description: error.response?.data?.detail || "Something went wrong",
+        description: error.message || "Something went wrong",
         variant: "destructive",
       })
     } finally {
