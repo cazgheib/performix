@@ -248,9 +248,9 @@ export const ClassesPage = () => {
                 onClick={handleToday}
                 variant="outline"
                 size="sm"
-                className="border-blue-500 text-blue-400 hover:bg-blue-500/20"
+                className="border-blue-500 text-blue-400 hover:bg-blue-500/20 bg-gray-800/50"
               >
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-4 w-4 mr-2 text-blue-400" />
                 Back to Today
               </Button>
             </div>
