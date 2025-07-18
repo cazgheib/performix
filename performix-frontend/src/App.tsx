@@ -1,5 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Navbar } from './components/Navbar'
 import { LoginPage } from './pages/LoginPage'
@@ -9,6 +11,8 @@ import { ClassesPage } from './pages/ClassesPage'
 import { MembershipPage } from './pages/MembershipPage'
 import { BookingsPage } from './pages/BookingsPage'
 import { Toaster } from '@/components/ui/toaster'
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890abcdef')
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -41,7 +45,8 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Elements stripe={stripePromise}>
+        <Router>
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800">
           <Navbar />
           <Routes>
@@ -98,6 +103,7 @@ function App() {
           <Toaster />
         </div>
       </Router>
+      </Elements>
     </AuthProvider>
   )
 }

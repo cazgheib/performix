@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import uuid
+import stripe
+import os
 
 app = FastAPI(title="Performix API", description="Book my wood - Advanced class booking system")
 
@@ -22,6 +24,8 @@ app.add_middleware(
 SECRET_KEY = "your-secret-key-here-change-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -48,6 +52,15 @@ class User(BaseModel):
 
 class MembershipCreate(BaseModel):
     type: str  # "daily", "weekly", "monthly"
+    payment_intent_id: Optional[str] = None
+
+class PaymentIntentCreate(BaseModel):
+    membership_type: str
+
+class PaymentIntentResponse(BaseModel):
+    client_secret: str
+    amount: int
+    currency: str
 
 class Membership(BaseModel):
     id: str
@@ -226,8 +239,49 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         created_at=current_user["created_at"]
     )
 
+@app.post("/create-payment-intent", response_model=PaymentIntentResponse)
+async def create_payment_intent(payment_data: PaymentIntentCreate, current_user: dict = Depends(get_current_user)):
+    if payment_data.membership_type == "daily":
+        amount = 1500  # $15.00 in cents
+    elif payment_data.membership_type == "weekly":
+        amount = 7500  # $75.00 in cents
+    elif payment_data.membership_type == "monthly":
+        amount = 19900  # $199.00 in cents
+    else:
+        raise HTTPException(status_code=400, detail="Invalid membership type")
+    
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency='usd',
+            metadata={
+                'user_id': current_user["id"],
+                'membership_type': payment_data.membership_type
+            }
+        )
+        
+        return PaymentIntentResponse(
+            client_secret=intent.client_secret,
+            amount=amount,
+            currency='usd'
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Payment intent creation failed: {str(e)}")
+
 @app.post("/memberships", response_model=Membership)
 async def create_membership(membership_data: MembershipCreate, current_user: dict = Depends(get_current_user)):
+    if membership_data.payment_intent_id:
+        try:
+            payment_intent = stripe.PaymentIntent.retrieve(membership_data.payment_intent_id)
+            if payment_intent.status != 'succeeded':
+                raise HTTPException(status_code=400, detail="Payment not completed")
+            
+            if payment_intent.metadata.get('membership_type') != membership_data.type:
+                raise HTTPException(status_code=400, detail="Payment does not match membership type")
+                
+        except stripe.error.StripeError as e:
+            raise HTTPException(status_code=400, detail=f"Payment verification failed: {str(e)}")
+    
     for membership in memberships_db.values():
         if membership["user_id"] == current_user["id"] and membership["is_active"]:
             membership["is_active"] = False
