@@ -7,7 +7,7 @@ import { useToast } from '../hooks/use-toast'
 import { PaymentForm } from '../components/PaymentForm'
 import axios from 'axios'
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://app-nimdsrfd.fly.dev'
 
 interface Membership {
   id: string

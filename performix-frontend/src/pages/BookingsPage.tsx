@@ -6,7 +6,7 @@ import { Calendar, Clock, Users, X, CheckCircle, AlertCircle } from 'lucide-reac
 import { useToast } from '../hooks/use-toast'
 import axios from 'axios'
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://app-nimdsrfd.fly.dev'
 
 interface Booking {
   id: string

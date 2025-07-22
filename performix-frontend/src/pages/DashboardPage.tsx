@@ -6,7 +6,7 @@ import { Calendar, Clock, Users, Trophy, TrendingUp, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://app-nimdsrfd.fly.dev'
 
 interface Class {
   id: string

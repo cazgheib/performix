@@ -11,7 +11,7 @@ import { Settings, Users, Calendar, CreditCard, BookOpen, Plus, Edit, Trash2, Ba
 import { useToast } from '../hooks/use-toast'
 import axios from 'axios'
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://app-nimdsrfd.fly.dev'
 
 interface User {
   id: string
