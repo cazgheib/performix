@@ -409,42 +409,49 @@ export const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-          <p className="text-gray-300">Manage your Performix application</p>
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-300">Manage your Performix application</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-gray-800/50">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Dashboard
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 bg-gray-800/50">
+            <TabsTrigger value="dashboard" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Dashboard</span>
+              <span className="sm:hidden">Dash</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Users
+            <TabsTrigger value="users" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Users</span>
+              <span className="sm:hidden">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="classes" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Classes
+            <TabsTrigger value="classes" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Classes</span>
+              <span className="sm:hidden">Class</span>
             </TabsTrigger>
-            <TabsTrigger value="memberships" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              Memberships
+            <TabsTrigger value="memberships" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Memberships</span>
+              <span className="sm:hidden">Member</span>
             </TabsTrigger>
-            <TabsTrigger value="packages" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Packages
+            <TabsTrigger value="packages" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Package className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Packages</span>
+              <span className="sm:hidden">Pack</span>
             </TabsTrigger>
-            <TabsTrigger value="bookings" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Bookings
+            <TabsTrigger value="bookings" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Bookings</span>
+              <span className="sm:hidden">Book</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Settings
+            <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Settings</span>
+              <span className="sm:hidden">Set</span>
             </TabsTrigger>
           </TabsList>
 
@@ -549,7 +556,8 @@ export const AdminPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-700">
                       <TableHead className="text-gray-300">Email</TableHead>
@@ -594,6 +602,7 @@ export const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -683,7 +692,8 @@ export const AdminPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-700">
                       <TableHead className="text-gray-300">Name</TableHead>
@@ -732,6 +742,7 @@ export const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -742,7 +753,8 @@ export const AdminPage = () => {
                 <CardTitle className="text-white">Memberships</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-700">
                       <TableHead className="text-gray-300">User ID</TableHead>
@@ -770,6 +782,7 @@ export const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -904,7 +917,8 @@ export const AdminPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-700">
                       <TableHead className="text-gray-300">Name</TableHead>
@@ -949,6 +963,7 @@ export const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -959,7 +974,8 @@ export const AdminPage = () => {
                 <CardTitle className="text-white">Bookings Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader>
                     <TableRow className="border-gray-700">
                       <TableHead className="text-gray-300">User ID</TableHead>
@@ -992,6 +1008,7 @@ export const AdminPage = () => {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
