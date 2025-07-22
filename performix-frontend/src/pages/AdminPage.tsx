@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -417,7 +418,70 @@ export const AdminPage = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 bg-gray-800/50">
+          {/* Mobile Dropdown Navigation */}
+          <div className="block md:hidden">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full bg-gray-800/50 border-gray-600 text-white">
+                <div className="flex items-center gap-2">
+                  {activeTab === 'dashboard' && <><BarChart3 className="h-4 w-4" /><span>Dashboard</span></>}
+                  {activeTab === 'users' && <><Users className="h-4 w-4" /><span>Users</span></>}
+                  {activeTab === 'classes' && <><Calendar className="h-4 w-4" /><span>Classes</span></>}
+                  {activeTab === 'memberships' && <><CreditCard className="h-4 w-4" /><span>Memberships</span></>}
+                  {activeTab === 'packages' && <><Package className="h-4 w-4" /><span>Packages</span></>}
+                  {activeTab === 'bookings' && <><BookOpen className="h-4 w-4" /><span>Bookings</span></>}
+                  {activeTab === 'settings' && <><Settings className="h-4 w-4" /><span>Settings</span></>}
+                </div>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectItem value="dashboard" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="users" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    <span>Users</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="classes" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>Classes</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="memberships" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    <span>Memberships</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="packages" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    <span>Packages</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="bookings" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span>Bookings</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="settings" className="text-white hover:bg-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop Tab Navigation */}
+          <TabsList className="hidden md:grid w-full grid-cols-4 lg:grid-cols-7 bg-gray-800/50">
             <TabsTrigger value="dashboard" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
               <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Dashboard</span>
