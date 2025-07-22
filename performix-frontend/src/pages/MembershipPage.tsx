@@ -17,61 +17,31 @@ interface Membership {
   is_active: boolean
 }
 
-const membershipPlans = [
-  {
-    type: 'daily',
-    name: 'Daily Pass',
-    price: '$15',
-    duration: '1 Day',
-    description: 'Perfect for trying us out',
-    features: [
-      'Access to all classes for 1 day',
-      'Full gym facilities',
-      'Locker room access',
-      'Basic support'
-    ],
-    color: 'from-blue-500 to-cyan-500',
-    icon: Zap,
-    popular: false
-  },
-  {
-    type: 'weekly',
-    name: 'Weekly Warrior',
-    price: '$75',
-    duration: '7 Days',
-    description: 'Great for short-term goals',
-    features: [
-      'Access to all classes for 1 week',
-      'Full gym facilities',
-      'Locker room access',
-      'Priority booking',
-      'Nutrition consultation'
-    ],
-    color: 'from-purple-500 to-pink-500',
-    icon: Calendar,
-    popular: true
-  },
-  {
-    type: 'monthly',
-    name: 'Monthly Champion',
-    price: '$199',
-    duration: '30 Days',
-    description: 'Best value for serious athletes',
-    features: [
-      'Access to all classes for 1 month',
-      'Full gym facilities',
-      'Locker room access',
-      'Priority booking',
-      'Personal training session',
-      'Nutrition consultation',
-      'Progress tracking',
-      'Premium support'
-    ],
-    color: 'from-orange-500 to-red-500',
-    icon: Crown,
-    popular: false
+const getColorForType = (type: string) => {
+  switch (type) {
+    case 'daily':
+      return 'from-blue-500 to-cyan-500';
+    case 'weekly':
+      return 'from-purple-500 to-pink-500';
+    case 'monthly':
+      return 'from-orange-500 to-red-500';
+    default:
+      return 'from-gray-500 to-gray-600';
   }
-]
+};
+
+const getIconForType = (type: string) => {
+  switch (type) {
+    case 'daily':
+      return Zap;
+    case 'weekly':
+      return Calendar;
+    case 'monthly':
+      return Crown;
+    default:
+      return Zap;
+  }
+};
 
 export const MembershipPage = () => {
   const [currentMembership, setCurrentMembership] = useState<Membership | null>(null)
@@ -80,11 +50,33 @@ export const MembershipPage = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [clientSecret, setClientSecret] = useState<string>('')
+  const [membershipPlans, setMembershipPlans] = useState<any[]>([])
   const { toast } = useToast()
 
   useEffect(() => {
+    fetchMembershipPlans()
     fetchCurrentMembership()
   }, [])
+
+  const fetchMembershipPlans = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/packages`)
+      const plans = response.data.map((pkg: any) => ({
+        type: pkg.type,
+        name: pkg.name,
+        price: `$${(pkg.price / 100).toFixed(0)}`,
+        duration: `${pkg.duration_days} Day${pkg.duration_days > 1 ? 's' : ''}`,
+        description: pkg.description,
+        features: pkg.features,
+        color: getColorForType(pkg.type),
+        icon: getIconForType(pkg.type),
+        popular: pkg.type === 'weekly'
+      }))
+      setMembershipPlans(plans)
+    } catch (error) {
+      console.error('Error fetching packages:', error)
+    }
+  }
 
   const fetchCurrentMembership = async () => {
     try {
@@ -221,7 +213,7 @@ export const MembershipPage = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {membershipPlans.map((plan) => {
           const Icon = plan.icon
           const isCurrentPlan = currentMembership?.type === plan.type
@@ -242,26 +234,26 @@ export const MembershipPage = () => {
                 </div>
               )}
 
-              <CardHeader className="text-center pb-3 sm:pb-4 p-4 sm:p-6">
-                <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-r ${plan.color} flex items-center justify-center`}>
-                  <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+              <CardHeader className="text-center pb-3 sm:pb-4 p-3 sm:p-4 lg:p-6">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 rounded-full bg-gradient-to-r ${plan.color} flex items-center justify-center`}>
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-white" />
                 </div>
-                <CardTitle className="text-white text-lg sm:text-xl lg:text-2xl mb-2">{plan.name}</CardTitle>
+                <CardTitle className="text-white text-base sm:text-lg lg:text-xl xl:text-2xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-2">
-                  <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{plan.price}</span>
+                  <span className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white">{plan.price}</span>
                   <span className="text-white/60 text-xs sm:text-sm">/{plan.duration}</span>
                 </div>
-                <CardDescription className="text-white/70 text-sm">
+                <CardDescription className="text-white/70 text-xs sm:text-sm">
                   {plan.description}
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
                 <ul className="space-y-2 sm:space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center text-white/80">
-                      <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm">{feature}</span>
+                  {plan.features.map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center text-white/80 text-xs sm:text-sm">
+                      <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -269,10 +261,8 @@ export const MembershipPage = () => {
                 <Button
                   onClick={() => handlePurchaseMembership(plan.type)}
                   disabled={isCurrentPlan || purchaseLoading === plan.type || (!canPurchase && !isCurrentPlan)}
-                  className={`w-full text-sm sm:text-base py-2 sm:py-3 ${
-                    isCurrentPlan
-                      ? 'bg-green-500 cursor-default'
-                      : `bg-gradient-to-r ${plan.color} hover:opacity-90`
+                  className={`w-full bg-gradient-to-r ${plan.color} hover:opacity-90 text-white font-semibold py-2 sm:py-3 text-sm sm:text-base ${
+                    isCurrentPlan ? 'bg-green-500 cursor-default' : ''
                   }`}
                 >
                   {purchaseLoading === plan.type ? (

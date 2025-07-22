@@ -46,6 +46,7 @@ users_db = {
 memberships_db = {}
 classes_db = {}
 bookings_db = {}
+packages_db = {}
 
 class AppSettings(BaseModel):
     id: str
@@ -98,6 +99,26 @@ class PaymentIntentResponse(BaseModel):
     client_secret: str
     amount: int
     currency: str
+
+class PackageCreate(BaseModel):
+    name: str
+    type: str
+    price: int
+    duration_days: int
+    description: str
+    features: List[str]
+    is_active: bool = True
+
+class Package(BaseModel):
+    id: str
+    name: str
+    type: str
+    price: int
+    duration_days: int
+    description: str
+    features: List[str]
+    is_active: bool
+    created_at: datetime
 
 class Membership(BaseModel):
     id: str
@@ -228,6 +249,45 @@ def init_sample_data():
     
     for class_data in sample_classes:
         classes_db[class_data["id"]] = class_data
+    
+    sample_packages = [
+        {
+            "id": "pkg-daily",
+            "name": "Daily Pass",
+            "type": "daily",
+            "price": 1500,
+            "duration_days": 1,
+            "description": "Perfect for trying us out",
+            "features": ["Access to all classes for 1 day", "Full gym facilities", "Locker room access", "Basic support"],
+            "is_active": True,
+            "created_at": datetime.utcnow()
+        },
+        {
+            "id": "pkg-weekly", 
+            "name": "Weekly Warrior",
+            "type": "weekly",
+            "price": 7500,
+            "duration_days": 7,
+            "description": "Great for short-term goals",
+            "features": ["Access to all classes for 1 week", "Full gym facilities", "Locker room access", "Priority booking", "Nutrition consultation"],
+            "is_active": True,
+            "created_at": datetime.utcnow()
+        },
+        {
+            "id": "pkg-monthly",
+            "name": "Monthly Champion", 
+            "type": "monthly",
+            "price": 19900,
+            "duration_days": 30,
+            "description": "Best value for serious athletes",
+            "features": ["Access to all classes for 1 month", "Full gym facilities", "Locker room access", "Priority booking", "Personal training session", "Nutrition consultation", "Progress tracking", "Premium support"],
+            "is_active": True,
+            "created_at": datetime.utcnow()
+        }
+    ]
+    
+    for package in sample_packages:
+        packages_db[package["id"]] = package
 
 init_sample_data()
 
@@ -314,14 +374,16 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 
 @app.post("/create-payment-intent", response_model=PaymentIntentResponse)
 async def create_payment_intent(payment_data: PaymentIntentCreate, current_user: dict = Depends(get_current_user)):
-    if payment_data.membership_type == "daily":
-        amount = 1500  # $15.00 in cents
-    elif payment_data.membership_type == "weekly":
-        amount = 7500  # $75.00 in cents
-    elif payment_data.membership_type == "monthly":
-        amount = 19900  # $199.00 in cents
-    else:
-        raise HTTPException(status_code=400, detail="Invalid membership type")
+    package = None
+    for pkg in packages_db.values():
+        if pkg["type"] == payment_data.membership_type and pkg["is_active"]:
+            package = pkg
+            break
+    
+    if not package:
+        raise HTTPException(status_code=400, detail="Package not found or inactive")
+    
+    amount = package["price"]
     
     try:
         intent = stripe.PaymentIntent.create(
@@ -329,7 +391,8 @@ async def create_payment_intent(payment_data: PaymentIntentCreate, current_user:
             currency='usd',
             metadata={
                 'user_id': current_user["id"],
-                'membership_type': payment_data.membership_type
+                'membership_type': payment_data.membership_type,
+                'package_id': package["id"]
             }
         )
         
@@ -362,14 +425,16 @@ async def create_membership(membership_data: MembershipCreate, current_user: dic
     membership_id = str(uuid.uuid4())
     start_date = datetime.utcnow()
     
-    if membership_data.type == "daily":
-        end_date = start_date + timedelta(days=1)
-    elif membership_data.type == "weekly":
-        end_date = start_date + timedelta(weeks=1)
-    elif membership_data.type == "monthly":
-        end_date = start_date + timedelta(days=30)
-    else:
-        raise HTTPException(status_code=400, detail="Invalid membership type")
+    package = None
+    for pkg in packages_db.values():
+        if pkg["type"] == membership_data.type and pkg["is_active"]:
+            package = pkg
+            break
+    
+    if not package:
+        raise HTTPException(status_code=400, detail="Package not found")
+    
+    end_date = start_date + timedelta(days=package["duration_days"])
     
     membership = {
         "id": membership_id,
@@ -585,6 +650,56 @@ async def admin_update_setting(setting_id: str, value: str, admin_user: dict = D
     
     settings_db[setting_id]["value"] = value
     return AppSettings(**settings_db[setting_id])
+
+@app.get("/packages", response_model=List[Package])
+async def get_packages():
+    return [Package(**package) for package in packages_db.values() if package["is_active"]]
+
+@app.get("/admin/packages", response_model=List[Package])
+async def admin_get_packages(admin_user: dict = Depends(get_admin_user)):
+    return [Package(**package) for package in packages_db.values()]
+
+@app.post("/admin/packages", response_model=Package)
+async def admin_create_package(package_data: PackageCreate, admin_user: dict = Depends(get_admin_user)):
+    package_id = str(uuid.uuid4())
+    new_package = {
+        "id": package_id,
+        "name": package_data.name,
+        "type": package_data.type,
+        "price": package_data.price,
+        "duration_days": package_data.duration_days,
+        "description": package_data.description,
+        "features": package_data.features,
+        "is_active": package_data.is_active,
+        "created_at": datetime.utcnow()
+    }
+    packages_db[package_id] = new_package
+    return Package(**new_package)
+
+@app.put("/admin/packages/{package_id}", response_model=Package)
+async def admin_update_package(package_id: str, package_data: PackageCreate, admin_user: dict = Depends(get_admin_user)):
+    if package_id not in packages_db:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    packages_db[package_id].update({
+        "name": package_data.name,
+        "type": package_data.type,
+        "price": package_data.price,
+        "duration_days": package_data.duration_days,
+        "description": package_data.description,
+        "features": package_data.features,
+        "is_active": package_data.is_active
+    })
+    
+    return Package(**packages_db[package_id])
+
+@app.delete("/admin/packages/{package_id}")
+async def admin_delete_package(package_id: str, admin_user: dict = Depends(get_admin_user)):
+    if package_id not in packages_db:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    del packages_db[package_id]
+    return {"message": "Package deleted successfully"}
 
 @app.get("/admin/dashboard")
 async def admin_get_dashboard(admin_user: dict = Depends(get_admin_user)):
