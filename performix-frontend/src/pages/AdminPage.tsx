@@ -301,7 +301,9 @@ export const AdminPage = () => {
       fetchAllData()
       toast({
         title: "Success",
-        description: "Setting updated successfully",
+        description: settingId === 'stripe-secret-key' ? 
+          "Stripe API key updated successfully" : 
+          "Setting updated successfully",
       })
     } catch (error: any) {
       toast({
@@ -1089,9 +1091,13 @@ export const AdminPage = () => {
                       <div>
                         <h3 className="text-white font-medium">{setting.key}</h3>
                         <p className="text-gray-400 text-sm">{setting.description}</p>
+                        {setting.category === 'payment' && (
+                          <p className="text-yellow-400 text-xs mt-1">⚠️ Sensitive - will be masked when saved</p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <Input
+                          type={setting.category === 'payment' ? 'password' : 'text'}
                           value={setting.value}
                           onChange={(e) => {
                             const newSettings = settings.map(s => 
@@ -1100,6 +1106,7 @@ export const AdminPage = () => {
                             setSettings(newSettings)
                           }}
                           className="bg-gray-800 border-gray-600 text-white w-48"
+                          placeholder={setting.category === 'payment' ? 'Enter new API key...' : ''}
                         />
                         <Button
                           size="sm"

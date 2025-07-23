@@ -37,28 +37,7 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Hyrox-themed background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800"></div>
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent transform -skew-y-12 scale-150"></div>
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-500/20 to-transparent transform skew-y-12 scale-150"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.1),transparent_50%)]"></div>
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(255,119,48,0.1),transparent_50%)]"></div>
-      </div>
-      {/* Geometric pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%),
-            linear-gradient(-45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)
-          `,
-          backgroundSize: '60px 60px',
-          backgroundPosition: '0 0, 30px 30px'
-        }}></div>
-      </div>
-      {/* Dark overlay for form visibility */}
-      <div className="absolute inset-0 bg-black/40"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-black via-gray-900 to-gray-800">
       
       <Card className="w-full max-w-md bg-gray-900/95 backdrop-blur-md border-gray-700/50 relative z-10 shadow-2xl">
         <CardHeader className="text-center">
