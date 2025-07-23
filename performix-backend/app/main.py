@@ -69,6 +69,13 @@ settings_db = {
         "value": "",
         "category": "theme",
         "description": "Background image URL"
+    },
+    "stripe-secret-key": {
+        "id": "stripe-secret-key",
+        "key": "stripe_secret_key", 
+        "value": os.getenv("STRIPE_SECRET_KEY", ""),
+        "category": "payment",
+        "description": "Stripe Secret API Key for payment processing"
     }
 }
 
@@ -641,15 +648,31 @@ async def admin_cancel_booking(booking_id: str, admin_user: dict = Depends(get_a
 
 @app.get("/admin/settings", response_model=List[AppSettings])
 async def admin_get_settings(admin_user: dict = Depends(get_admin_user)):
-    return [AppSettings(**setting) for setting in settings_db.values()]
+    settings_list = []
+    for setting in settings_db.values():
+        setting_copy = setting.copy()
+        if setting["category"] == "payment" and setting["value"]:
+            setting_copy["value"] = "****" + setting["value"][-4:] if len(setting["value"]) > 4 else "****"
+        settings_list.append(AppSettings(**setting_copy))
+    return settings_list
 
 @app.put("/admin/settings/{setting_id}", response_model=AppSettings)
 async def admin_update_setting(setting_id: str, value: str, admin_user: dict = Depends(get_admin_user)):
     if setting_id not in settings_db:
         raise HTTPException(status_code=404, detail="Setting not found")
     
+    if setting_id == "stripe-secret-key":
+        if value and not (value.startswith("sk_test_") or value.startswith("sk_live_")):
+            raise HTTPException(status_code=400, detail="Invalid Stripe API key format")
+        stripe.api_key = value
+    
     settings_db[setting_id]["value"] = value
-    return AppSettings(**settings_db[setting_id])
+    
+    setting_copy = settings_db[setting_id].copy()
+    if setting_copy["category"] == "payment" and setting_copy["value"]:
+        setting_copy["value"] = "****" + setting_copy["value"][-4:] if len(setting_copy["value"]) > 4 else "****"
+    
+    return AppSettings(**setting_copy)
 
 @app.get("/packages", response_model=List[Package])
 async def get_packages():
