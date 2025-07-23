@@ -38,34 +38,7 @@ export const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Hyrox gym floor background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800"></div>
-      
-      {/* Different gym floor pattern */}
-      <div className="absolute inset-0 opacity-8" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, #4B5563 2px, transparent 0)`,
-        backgroundSize: '40px 40px'
-      }}></div>
-      
-      {/* Different equipment silhouettes */}
-      <div className="absolute inset-0 opacity-7">
-        <div className="absolute top-1/3 right-1/5 transform rotate-30">
-          <div className="w-10 h-10 bg-gray-400 rounded-sm"></div>
-          <div className="w-8 h-8 bg-gray-500 rounded-sm mt-1 ml-1"></div>
-        </div>
-        <div className="absolute bottom-1/3 left-1/5 transform -rotate-15">
-          <div className="w-14 h-4 bg-gray-400 rounded-full"></div>
-        </div>
-      </div>
-      
-      {/* "START" overlay text */}
-      <div className="absolute top-10 right-10 opacity-4">
-        <div className="text-5xl font-bold text-white transform rotate-12">START</div>
-      </div>
-      
-      {/* Dark overlay for form visibility */}
-      <div className="absolute inset-0 bg-black/50"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-black via-gray-900 to-gray-800">
       <Card className="w-full max-w-md bg-gray-900/90 backdrop-blur-sm border-gray-700/50">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
