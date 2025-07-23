@@ -149,33 +149,76 @@ export const MembershipPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300"></div>
+      <div className="min-h-screen flex items-center justify-center relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800"></div>
+        <div className="relative z-10 animate-spin rounded-full h-32 w-32 border-b-2 border-gray-300"></div>
       </div>
     )
   }
 
   if (showPaymentForm && selectedPlan && clientSecret) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
-        <PaymentForm
-          clientSecret={clientSecret}
-          amount={parseInt(selectedPlan.price.replace('$', '')) * 100}
-          membershipType={selectedPlan.name}
-          onSuccess={handlePaymentSuccess}
-          onCancel={handlePaymentCancel}
-        />
+      <div className="min-h-screen relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+          <PaymentForm
+            clientSecret={clientSecret}
+            amount={parseInt(selectedPlan.price.replace('$', '')) * 100}
+            membershipType={selectedPlan.name}
+            onSuccess={handlePaymentSuccess}
+            onCancel={handlePaymentCancel}
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
-      <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Choose Your Membership</h1>
-        <p className="text-base sm:text-lg lg:text-xl text-white/80 mb-6 sm:mb-8">
-          Unlock your potential with our flexible membership options
-        </p>
+    <div className="min-h-screen relative">
+      {/* Hyrox membership background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800">
+        <div className="absolute inset-0 opacity-14">
+          <div className="absolute top-24 left-24 w-32 h-32 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full blur-3xl"></div>
+          <div className="absolute top-2/3 right-24 w-36 h-36 bg-gradient-to-r from-gray-800 to-gray-700 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-24 left-1/2 w-28 h-28 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full blur-3xl"></div>
+        </div>
+        
+        {/* Membership equipment silhouettes */}
+        <div className="absolute inset-0 opacity-7">
+          <div className="absolute top-1/4 right-1/4 transform rotate-20">
+            <div className="w-15 h-15 bg-gray-400 rounded-full"></div>
+            <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-sm font-bold">20</div>
+          </div>
+          <div className="absolute bottom-1/4 left-1/4 transform -rotate-25">
+            <div className="w-20 h-4 bg-gray-400 rounded-full"></div>
+            <div className="w-16 h-3 bg-gray-500 rounded-full mt-1 ml-2"></div>
+          </div>
+          <div className="absolute top-2/3 left-1/6 transform rotate-45">
+            <div className="w-8 h-8 bg-gray-500 rounded-sm"></div>
+          </div>
+        </div>
+        
+        {/* Membership grid pattern */}
+        <div className="absolute inset-0 opacity-5" style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)
+          `,
+          backgroundSize: '45px 45px'
+        }}></div>
+        
+        {/* "MEMBER" overlay */}
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 opacity-3">
+          <div className="text-6xl font-bold text-white">MEMBER</div>
+        </div>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Choose Your Membership</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-white/80 mb-6 sm:mb-8">
+            Unlock your potential with our flexible membership options
+          </p>
 
         {currentMembership && (
           <div className="max-w-md mx-auto mb-6 sm:mb-8">
@@ -211,9 +254,9 @@ export const MembershipPage = () => {
             </Card>
           </div>
         )}
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {membershipPlans.map((plan) => {
           const Icon = plan.icon
           const isCurrentPlan = currentMembership?.type === plan.type
@@ -288,9 +331,9 @@ export const MembershipPage = () => {
             </Card>
           )
         })}
-      </div>
+        </div>
 
-      <div className="mt-12 sm:mt-16 text-center">
+        <div className="mt-12 sm:mt-16 text-center">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 max-w-4xl mx-auto">
           <CardContent className="p-4 sm:p-6 lg:p-8">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Why Choose Performix?</h2>
@@ -325,6 +368,7 @@ export const MembershipPage = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )

@@ -38,25 +38,35 @@ export const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Hyrox-themed background */}
+      {/* Hyrox gym floor background */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800"></div>
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent transform -skew-y-12 scale-150"></div>
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-500/20 to-transparent transform skew-y-12 scale-150"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.1),transparent_50%)]"></div>
-        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_80%,rgba(255,119,48,0.1),transparent_50%)]"></div>
+      
+      {/* Gym floor texture pattern */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `
+          linear-gradient(45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+          linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '30px 30px'
+      }}></div>
+      
+      {/* Equipment silhouettes */}
+      <div className="absolute inset-0 opacity-6">
+        <div className="absolute top-1/4 left-1/6 transform -rotate-45">
+          <div className="w-12 h-12 bg-gray-500 rounded-full"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs font-bold">24</div>
+        </div>
+        <div className="absolute bottom-1/4 right-1/6 transform rotate-12">
+          <div className="w-16 h-3 bg-gray-400 rounded-full"></div>
+          <div className="w-12 h-2 bg-gray-500 rounded-full mt-1 ml-2"></div>
+        </div>
       </div>
-      {/* Geometric pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%),
-            linear-gradient(-45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)
-          `,
-          backgroundSize: '60px 60px',
-          backgroundPosition: '0 0, 30px 30px'
-        }}></div>
+      
+      {/* "FINISH" overlay text */}
+      <div className="absolute bottom-10 left-10 opacity-5">
+        <div className="text-6xl font-bold text-white transform -rotate-12">FINISH</div>
       </div>
+      
       {/* Dark overlay for form visibility */}
       <div className="absolute inset-0 bg-black/40"></div>
       

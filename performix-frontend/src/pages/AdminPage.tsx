@@ -412,7 +412,38 @@ export const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 p-2 sm:p-4">
+    <div className="min-h-screen relative">
+      {/* Hyrox admin background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-16 left-16 w-36 h-36 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-16 right-16 w-40 h-40 bg-gradient-to-r from-gray-800 to-gray-700 rounded-full blur-3xl"></div>
+        </div>
+        
+        {/* Admin equipment silhouettes */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-1/3 left-1/6 transform rotate-15">
+            <div className="w-12 h-12 bg-gray-500 rounded-lg"></div>
+            <div className="w-10 h-10 bg-gray-600 rounded-lg mt-1 ml-1"></div>
+          </div>
+          <div className="absolute bottom-1/3 right-1/6 transform -rotate-10">
+            <div className="w-16 h-5 bg-gray-400 rounded-full"></div>
+          </div>
+        </div>
+        
+        {/* Subtle admin grid */}
+        <div className="absolute inset-0 opacity-3" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #6B7280 1px, transparent 0)`,
+          backgroundSize: '50px 50px'
+        }}></div>
+        
+        {/* "ADMIN" overlay */}
+        <div className="absolute top-1/2 left-10 opacity-2">
+          <div className="text-8xl font-bold text-white transform -rotate-90 origin-center">ADMIN</div>
+        </div>
+      </div>
+      
+      <div className="relative z-10 p-2 sm:p-4"></div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-4 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Admin Dashboard</h1>

@@ -83,15 +83,51 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-          Welcome back, {user?.full_name}! 💪
-        </h1>
-        <p className="text-white/80 text-sm sm:text-base">Ready to crush your fitness goals today?</p>
+    <div className="min-h-screen relative">
+      {/* Hyrox gym background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-800">
+        <div className="absolute inset-0 opacity-12">
+          <div className="absolute top-20 left-20 w-28 h-28 bg-gradient-to-r from-gray-700 to-gray-600 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-32 w-32 h-32 bg-gradient-to-r from-gray-800 to-gray-700 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-32 left-1/3 w-24 h-24 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full blur-3xl"></div>
+        </div>
+        
+        {/* Equipment silhouettes */}
+        <div className="absolute inset-0 opacity-6">
+          <div className="absolute top-1/5 left-1/5 transform -rotate-20">
+            <div className="w-14 h-14 bg-gray-400 rounded-full"></div>
+            <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-sm font-bold">16</div>
+          </div>
+          <div className="absolute bottom-1/4 right-1/4 transform rotate-25">
+            <div className="w-18 h-4 bg-gray-400 rounded-full"></div>
+            <div className="w-14 h-3 bg-gray-500 rounded-full mt-1 ml-2"></div>
+          </div>
+        </div>
+        
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-4" style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px'
+        }}></div>
+        
+        {/* "TRAIN" overlay */}
+        <div className="absolute bottom-20 right-20 opacity-3">
+          <div className="text-7xl font-bold text-white transform -rotate-6">TRAIN</div>
+        </div>
       </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+            Welcome back, {user?.full_name}! 💪
+          </h1>
+          <p className="text-white/80 text-sm sm:text-base">Ready to crush your fitness goals today?</p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50 text-white">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
@@ -148,9 +184,9 @@ export const DashboardPage = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 backdrop-blur-md border-gray-700/50">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
@@ -248,6 +284,7 @@ export const DashboardPage = () => {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )
