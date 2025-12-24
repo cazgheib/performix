@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# Performix Frontend - React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Performix fitness booking platform. It provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
 
